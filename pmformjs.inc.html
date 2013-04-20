@@ -1,0 +1,73 @@
+<script type="text/javascript">
+function addEvent(object, evName, fnName, cap) {
+   if (object.attachEvent)
+       object.attachEvent("on" + evName, fnName);
+   else if (object.addEventListener)
+       object.addEventListener(evName, fnName, cap);
+}
+
+addEvent(window, "load", setLink, false);
+function setLink(){
+document.getElementById("sendmessage_link").onclick=createPMForm;
+}
+
+function createPMForm(){
+	document.getElementById("pm_container").style.display="none";
+	//alert("I am trying to create a form")
+	var pmForm=document.createElement("form");
+	pmForm.action="";
+	pmForm.method="post";
+	pmForm.id="pmform";
+	var pmForm_header=document.createElement("h2");
+	pmForm_header.id="pmForm_header";
+	pmForm_header.innerHTML="New Message";
+	pmForm.appendChild(pmForm_header);
+	//---------------------------end of creating header
+	var name_para=document.createElement("p");
+	var name=document.createElement("span");
+	name.id="ally_name";
+	name.innerHTML="To: ";
+	
+	var name_input=document.createElement("input");
+	name_input.id="location";
+	name_input.name="name_input";
+
+	name_para.appendChild(name);
+	name_para.appendChild(name_input);
+	
+	
+	
+	
+	pmForm.appendChild(name_para);
+	var pmessage=document.createElement("span");
+	pmessage.id="pmessage_to";
+	pmessage.innerHTML="Message: ";
+	
+	var message_input=document.createElement("textarea");
+	message_input.id="message_input";
+	message_input.name="message_input";
+	var message_para=document.createElement("p")
+	message_para.appendChild(pmessage);
+	message_para.appendChild(message_input);
+	pmForm.appendChild(message_para);
+	
+	var buttons_para=document.createElement("p");
+	buttons_para.id="buttons_para";
+	var pm_submitBtn=document.createElement("input");
+	pm_submitBtn.type="submit";
+	pm_submitBtn.name="pm_submit";
+	pm_submitBtn.id="pm_submit";
+	pm_submitBtn.value="Send"
+	buttons_para.appendChild(pm_submitBtn);
+	var pm_cancelBtn=document.createElement("input");
+	pm_cancelBtn.type="submit";
+	pm_cancelBtn.name="pm_cancel";
+	pm_cancelBtn.id="pm_cancel";
+	pm_cancelBtn.value="Cancel";
+	buttons_para.appendChild(pm_cancelBtn);
+	pmForm.appendChild(buttons_para);
+	//append the form to the body
+	document.body.appendChild(pmForm);
+}
+
+</script>

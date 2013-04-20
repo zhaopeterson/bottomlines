@@ -1,0 +1,25 @@
+#gallery_photoalbum a {
+	background-color: #666;
+	margin: 10px;
+	padding: 3px;
+	float: left;
+	border: 1px solid #CCC;
+}
+
+
+#gallery_photoalbum img {
+	display:block;
+}
+
+#gallery_photoalbum {
+	background-color: #EFEFEF;
+	min-height:360px;
+}
+#gallery_photoalbum a:hover {
+	background-color: #666;
+	margin: 10px;
+	padding: 3px;
+	float: left;
+	border: 1px solid #FF4d07;
+
+}

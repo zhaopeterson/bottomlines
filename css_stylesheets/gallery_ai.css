@@ -1,0 +1,29 @@
+#gallery_ai a {
+	padding:5px 5px 5px 5px;
+	border: 1px solid #BACCD9;
+	display: block;
+	float: left;
+	margin: 5px 15px 10px 10px;
+	width: 100px;
+	background-image: url(../photos_2010/large/photothumb_dropshadow.png);
+}
+
+
+#gallery_ai img {
+	display:block;
+}
+
+#gallery_ai {
+	width: 69em;
+	padding: 0.5em;
+	height: 22em;
+}
+#gallery_ai a:hover {
+	padding:5px 5px 5px 5px;
+	border: 1px solid #FF4D07;
+	display: block;
+	float: left;
+	margin: 5px 15px 10px 10px;
+	width: 100px;
+	background-image: url(../photos_2010/large/photothumb_dropshadow.png);
+}

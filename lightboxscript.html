@@ -1,0 +1,253 @@
+<script type="text/javascript">
+function addEvent(object, evName, fnName, cap) {
+   if (object.attachEvent)
+       object.attachEvent("on" + evName, fnName);
+   else if (object.addEventListener)
+       object.addEventListener(evName, fnName, cap);
+}
+
+addEvent(window, "load", setupSlideshow, false);
+
+
+function setupSlideshow(){
+	var slides= new Array();
+	//populate array of slide images
+	for (var i=0; i<document.images.length; i++){
+		var thumb = document.images[i];
+		if(thumb.className=="slide" && thumb.parentNode.tagName == "A"){
+			slides.push(thumb);
+		}
+
+	}
+	
+	var cContainers=new Array();
+
+	for (var i=0; i<document.getElementsByTagName("div").length; i++){
+		var divContainer=document.getElementsByTagName("div")[i];
+		if (divContainer.className=="cContainer"){
+			cContainers.push(divContainer);
+			
+		}
+		
+	}
+
+	
+	for (var i=0; i<slides.length; i++){
+
+		createRollover(slides[i]);
+
+		createHighRes(slides[i], i);
+	}
+	if(slides.length>0){
+		createOverlay();
+		createGallery(slides);
+
+	}
+}
+
+function createRollover(thumb){
+	thumb.out=new Image();
+	thumb.over=new Image();
+	thumb.out.src=thumb.src;
+	thumb.over.src=thumb.src.replace(/_thumb/, "_over");
+	thumb.onmouseout=function(){
+		thumb.src=thumb.out.src;
+	}
+	thumb.onmouseover=function(){
+		thumb.src=thumb.over.src;
+	}
+}
+
+function createGallery(slides){
+	var galleryBox=document.createElement("div");
+	galleryBox.id="galleryBox";
+	
+	var winW=window.innerWidth;
+	//insert a button to close the gallery
+	var galleryTitle=document.createElement("p");
+	galleryTitle.id="galleryTitle";
+	var closeButton=document.createElement("input");
+	closeButton.type="image";
+	closeButton.src="images_bl/galleryclose.png";
+	closeButton.onclick=function(){
+		fadeOut("galleryBox", 100, 0.1, 0);
+		fadeOut("pageOverlay", 80, 0.1, 0);
+		setTimeout(function(){
+		galleryBox.style.display="none";
+		document.getElementById("pageOverlay").style.display="none";
+							}, 0);
+		window.location.reload();
+	}
+	galleryTitle.appendChild(closeButton);
+	galleryBox.appendChild(galleryTitle);
+	
+	//create the gallery footer############################################################################
+	var galleryFooter=document.createElement("p");
+	galleryFooter.id="galleryFooter";
+	
+	//create a button to go to the previous slide;
+	var slideBack=document.createElement("input");
+	slideBack.type="image";
+	slideBack.src="images_bl/back.png";
+	slideBack.onclick=function(){
+		//get the index of the current slide
+		var currentSlide=document.getElementById("gallerySlide");
+		var currentIndex=currentSlide.index;
+		
+		//descrease the index by 1
+		currentIndex--;
+		//if current slide is the first slide go back to the last one
+		if(currentIndex== -1) currentIndex=slides.length-1;		
+		//change the image int he gallery
+		changeSlide(slides[currentIndex]);
+	}
+	galleryFooter.appendChild(slideBack);
+	
+	//show the initial slide number
+	var slideNum=document.createElement("span");
+	slideNum.id="slideNumber";
+	slideNum.innerHTML="1";
+	
+	//show the total number of slides
+	var slideTotal=document.createTextNode(" of " +slides.length);
+	galleryFooter.appendChild(slideNum);
+	galleryFooter.appendChild(slideTotal);
+	
+	//create a button to go to the next slide
+	var slideForward=document.createElement("input");
+	slideForward.type="image";
+	slideForward.src="images_bl/forward.png";
+	slideForward.onclick=function(){
+		//get the index of the current slide
+		var currentSlide=document.getElementById("gallerySlide");
+		var currentIndex=currentSlide.index;
+		
+		//increase the index by 1
+		currentIndex++;
+		//if current slide is the first slide go back to the last one
+		if(currentIndex== slides.length) currentIndex=0;		
+		//change the image int he gallery
+		changeSlide(slides[currentIndex]);
+	}
+	galleryFooter.appendChild(slideForward);
+	
+	galleryBox.appendChild(galleryFooter);
+	
+	//insert a high res slide**********************************************************************************************
+	var slide=document.createElement("img");
+	slide.id="gallerySlide";
+	slide.src=slides[0].big.src;
+	slide.index=0;
+	galleryBox.appendChild(slide);
+		//insert a slide caption;
+	var slideCaption=document.createElement("p");
+	slideCaption.id="slideCaption";
+	slideCaption.innerHTML=slides[0].alt;
+	galleryBox.appendChild(slideCaption);
+	
+	//-----------------------------------------------------------------------------------------------------------
+	//create the gallery comment container
+	
+	var commentContainer=document.createElement("div");
+	commentContainer.id="commentContainer_lb";
+	commentContainer.innerHTML=document.getElementById("commentContainer_orig<?php echo $count; ?>").innerHTML;
+	commentContainer.className="lb_comment";
+	
+	
+	galleryBox.appendChild(commentContainer);
+
+	
+	document.body.appendChild(galleryBox);
+	
+}
+//----------------------------------------------------------------------------------------end of add commentContainer
+function createHighRes(thumb, index){
+	thumb.big = new Image();
+	thumb.big.src=thumb.src.replace(/_thumb/, "");
+	
+	//display high res image in the slide gallery
+	thumb.onclick=showGallery;
+	
+	//set the index of the slide
+	thumb.big.index = index;
+}
+//---------------------------------------------------------------------------------------showgallery
+function showGallery(){
+	
+	//change the image based on the clicked thum
+	changeSlide(this);
+	//reveal the slide show
+	document.getElementById("galleryBox").style.display="block";
+	document.getElementById("pageOverlay").style.display="none";
+	//halt propagation of the click event
+	return false;
+}
+
+function changeSlide(slide){
+	//set object references
+	var galleryBox = document.getElementById("galleryBox");
+	var oldSlide=document.getElementById("gallerySlide");
+	var slideCaption=document.getElementById("slideCaption");
+	var slideNum=document.getElementById("slideNumber");
+	//get the object conaing the comments############################################
+	var commentBox=document.getElementById("commentContainer_lb");	
+	//replace current slide with new slide
+	setOpacity("gallerySlide", 0);
+	setOpacity("pageOverlay", 80);
+	var newSlide=oldSlide.cloneNode(true);
+	newSlide.src=slide.big.src;
+	newSlide.index=slide.big.index;
+	galleryBox.replaceChild(newSlide, oldSlide);
+	fadeIn("gallerySlide", 100, 0.5,0);
+	//fadeIn("pageOverlay", 80, 0, 0);
+	//replace current cpation with new caption
+	slideCaption.innerHTML = slide.alt;
+	
+	//update the slide number
+	slideNum.innerHTML=newSlide.index+1;
+	
+	//replace the comment box with new content
+	var newCommentBox="commentContainer_orig"+slideNum.innerHTML;
+	commentBox.innerHTML=document.getElementById(newCommentBox).innerHTML;
+	
+}
+
+function createOverlay(){
+	//create an overlay to obscure the view of the web page
+	var pageOverlay=document.createElement("div");
+	pageOverlay.id="pageOverlay";
+	document.body.appendChild(pageOverlay);
+}
+
+function setOpacity(objID, value){
+	var object=document.getElementById(objID);
+	
+	//appy the opacity value for ie or non ie 
+	object.style.filter="alpha(opacity="+value+")";
+	object.style.opacity=value/100;
+}
+
+function fadeIn(objID, maxOpacity, fadeTime, delay){
+	//calculate the interval between opacity changes
+	var fadeInt=Math.round(fadeTime*1000)/maxOpacity;
+	
+	//loop up the opacity range
+	for (var i=0; i<=maxOpacity; i++){
+		setTimeout("setOpacity('"+objID+"', "+i+")", delay);
+		delay += fadeInt;
+	}
+}
+
+function fadeOut(objID, maxOpacity, fadeTime, delay){
+	//calculate the interval between the opacity changes
+	var fadeInt=Math.round(fadeTime*1000)/maxOpacity;
+	
+	//loop down the range of opacity values
+	for (var i=maxOpacity; i>=0; i--){
+		setTimeout("setOpacity('"+objID+"', "+i+")", delay);
+		delay+=fadeInt;
+	}
+}
+
+
+</script>
